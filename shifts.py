@@ -1,23 +1,22 @@
 """
 Author: Cristian Di Pietrantonio.
-
+Author: Luigi Berducci.
 """
 import json
 import requests
 import datetime
 import sys
-from constraint import *
 
 
 
 def parse_doodle(pollID):
     """
     Retrieves poll data from doodle.com given the poll identifier.
-    
+
     Parameters:
     -----------
         - `pollID`: the poll identifier (get it from the url)
-    
+
     Returns:
     --------
     a tuple (participants, options, calendar) where
@@ -40,7 +39,7 @@ def parse_doodle(pollID):
         for i, pref in enumerate(participant['preferences']):
             if pref == 1:
                 calendar[i].append(pID)
-        
+
     for k in calendar:
         if len(calendar[k]) == 0:
             emptyShiftCounter += 1
@@ -75,7 +74,7 @@ def validate_value(n):
     except ValueError:
         n = ""
     if n == "" or n < 0:
-        print("Error: input \"{}\" not valid.".format(n)) 
+        print("Error: input \"{}\" not valid.".format(n))
         exit(1)
     return n
 
@@ -90,79 +89,10 @@ def ask_for_min_max_shifts(participants):
         if p >= 0:
             n = input("Min and max number of shifts to assign to {} (format: 'min,max' or just 'min')? ".format(participants[p])).split(',')
             if len(n) == 1:
-                minMaxShifts[p] = (validate_value(n[0]), None)     
+                minMaxShifts[p] = (validate_value(n[0]), None)
             else:
                 minMaxShifts[p] = (validate_value(n[0]), validate_value(n[1]))
     return minMaxShifts
-
-
-
-class MinimumValueFrequency(Constraint):
-    """
-    This constraint models the fact that each variable value must appear at least
-    with a minimum specified frequency in the solution.
-    """
-
-    
-    def __init__(self, value, frequency, others):
-        self._value = value
-        # frequency of each value, itially 0
-        self._minFreq = frequency
-        # the following information is used later, as optimization step.
-        # It is the sum of all other values' minimum frequency
-        self._others = others
-        
-
-    def __call__(self, variables, domains, assignments, forwardcheck=False):
-
-        missing = False
-        # maximum frequency is M
-        freq = 0
-        M = len(variables)
-        for variable in variables:
-            if variable in assignments:
-                if assignments[variable] == self._value:
-                    freq += 1
-            else:
-                missing = True
-        # if the assignment is incomplete, maybe we can see if it can be discarded too
-        if missing:
-            if freq > M - self._others:
-                return False
-            else:
-                return True
-        
-        if freq < self._minFreq:
-            return False
-        else:
-            return True
-
-
-class MaximumValueFrequency(Constraint):
-    """
-    This constraint models the fact that each variable value must appear at most 
-    a specified frequency in the solution.
-    """
-
-    
-    def __init__(self, value, frequency):
-        self._value = value
-        # frequency of each value, itially 0
-        self._maxFreq = frequency
-        
-
-    def __call__(self, variables, domains, assignments, forwardcheck=False):
-
-        freq = 0
-        for variable in variables:
-            if variable in assignments:
-                if assignments[variable] == self._value:
-                    freq += 1
-                    if freq > self._maxFreq:
-                        return False
-        return True
-
-
 
 def solve_with_constraints_lib(participants, options, calendar, partToMinShifts):
     """
@@ -178,7 +108,7 @@ def solve_with_constraints_lib(participants, options, calendar, partToMinShifts)
     turni = Problem(MinConflictsSolver(1000000))
     for k in calendar:
         turni.addVariable(k, calendar[k])
-    
+
     empty_shift = lambda x: x[0] < 0
     # Constraint 1 - maximum one shift per person per day
     slotsInSameDay = list() if empty_shift(calendar[0]) else [0]
@@ -200,7 +130,7 @@ def solve_with_constraints_lib(participants, options, calendar, partToMinShifts)
     for k in partToMinShifts:
         if k < 0:
             continue
-        minVal, maxVal = partToMinShifts[k]      
+        minVal, maxVal = partToMinShifts[k]
         turni.addConstraint(MinimumValueFrequency(k, minVal, sum([partToMinShifts[g][0] for g in partToMinShifts if g != k])))
         if maxVal is not None:
             turni.addConstraint(MaximumValueFrequency(k, maxVal))
@@ -218,9 +148,15 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: shifts.py <doodle-poll-id>")
         exit(1)
-    
+
     pollID = sys.argv[1]
     participants, options, calendar = parse_doodle(pollID)
+
+    print(participants)
+    print("\n")
+    print(options)
+    print("\n")
+    print(calendar)
     # create CSP problem
-    partToMinShifts = ask_for_min_max_shifts(participants)
-    solve_with_constraints_lib(participants, options, calendar, partToMinShifts)
+    # partToMinShifts = ask_for_min_max_shifts(participants)
+    # solve_with_constraints_lib(participants, options, calendar, partToMinShifts)

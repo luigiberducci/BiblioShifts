@@ -27,8 +27,21 @@ def parse_doodle(pollID):
     JSON = requests.get("https://doodle.com/api/v2.0/polls/" + pollID).content.decode('utf-8')
     JSON = json.loads(JSON)
 
-    options = [datetime.datetime.fromtimestamp(x['start']/1000) for x in JSON['options']]
-    calendar = dict([(i, list()) for i in range(len(options))])
+    options = [ datetime.datetime.fromtimestamp(x['start']/1000)
+                for x in JSON['options']]
+    options_dict = dict()
+    for d in options:
+        options_dict[str(d.year) + "-" + str(d.month).zfill(2) + "-" + str(d.day).zfill(2)] = []
+
+    for d in options:
+        options_dict[str(d.year) + "-" + str(d.month).zfill(2) + "-" + str(d.day).zfill(2)].append( str(d.hour).zfill(2) + ":" + str(d.minute).zfill(2))
+
+    calendar = dict()
+    for d, k in enumerate(options_dict.keys()):
+        calendar[k] = dict()
+        for t, l in enumerate(options_dict.get(k)):
+            calendar[k][l] = list()
+
     participants = dict()
     emptyShiftCounter = 0
     for participant in JSON['participants']:
@@ -37,16 +50,22 @@ def parse_doodle(pollID):
         participants[pID] = pName
 
         for i, pref in enumerate(participant['preferences']):
-            if pref == 1:
-                calendar[i].append(pID)
+            if pref <= 0:
+                continue
+            k2 = 0
+            for d, k in enumerate(options_dict.keys()):
+                for t, l in enumerate(options_dict.get(k)):
+                    if k2==i:
+                        calendar[k][l].append(pID)
+                    k2 = k2+1
 
     for k in calendar:
         if len(calendar[k]) == 0:
             emptyShiftCounter += 1
-            calendar[k].append(-emptyShiftCounter) # empty shift
-            participants[-emptyShiftCounter] = "<vuoto>"
+            # calendar[k].append(-emptyShiftCounter) # empty shift
+            # participants[-emptyShiftCounter] = "<vuoto>"
 
-    return participants, options, calendar
+    return participants, options, options_dict, calendar
 
 
 
@@ -89,7 +108,10 @@ def ask_for_min_max_shifts(participants):
         if p >= 0:
             n = input("Min and max number of shifts to assign to {} (format: 'min,max' or just 'min')? ".format(participants[p])).split(',')
             if len(n) == 1:
-                minMaxShifts[p] = (validate_value(n[0]), None)
+                if n[0] == "":
+                    minMaxShifts[p] = (None, None)
+                else:
+                    minMaxShifts[p] = (validate_value(n[0]), None)
             else:
                 minMaxShifts[p] = (validate_value(n[0]), validate_value(n[1]))
     return minMaxShifts
@@ -150,13 +172,163 @@ if __name__ == "__main__":
         exit(1)
 
     pollID = sys.argv[1]
-    participants, options, calendar = parse_doodle(pollID)
+    participants, options, options_dict, calendar = parse_doodle(pollID)
 
-    print(participants)
-    print("\n")
-    print(options)
-    print("\n")
-    print(calendar)
+    # sys.stdout.write("**********************************************\n")
+    # sys.stdout.write("               PARTICIPANTS\n")
+    # sys.stdout.write("**********************************************\n")
+    # for k,i in enumerate(participants.keys()):
+    #     if k==0:
+    #         sys.stdout.write(participants.get(i))
+    #     else:
+    #         sys.stdout.write(", " + participants.get(i))
+
+    # sys.stdout.write("\n\n")
+    # sys.stdout.write("**********************************************\n")
+    # sys.stdout.write("              LIST OPTIONS\n")
+    # sys.stdout.write("**********************************************\n")
+    # for k,d in enumerate(options):
+    #     if k==0:
+    #         sys.stdout.write(str(d))
+    #     else:
+    #         sys.stdout.write(", " + str(d))
+
+    # sys.stdout.write("\n\n")
+    # sys.stdout.write("**********************************************\n")
+    # sys.stdout.write("                   CALENDAR\n")
+    # sys.stdout.write("**********************************************\n")
+    # sys.stdout.write("    DAY    :   SLOT    ->    PARTICIPANTS\n")
+    # sys.stdout.write("**********************************************\n")
+    shift_names = set()
+    for k, d in enumerate(calendar.keys()):
+        for k, t in enumerate(calendar.get(d).keys()):
+            shift_names.add(t)
+    shift_names = sorted(shift_names)
+
+    # Ask to the user the minimum number of shifts
+    partToMinShifts = ask_for_min_max_shifts(participants)
+
+    # Print the file .dat for CPLEX
+    # Compute the maximum number of shifts in a day, among all days
+    max_daily_shifts = len(shift_names)
+    max_num_shifts = max_daily_shifts * len(options_dict.keys())
+    outFilepath = "output.txt"
+    out = ""
+
+    # Header
+    out += "/*********************************************\n"
+    out += " * OPL 12.8.0.0 Data\n"
+    out += " * Author: Luigi Berducci\n"
+    out += " * Creation Date: {}\n".format(datetime.date.today())
+    out += " *********************************************/\n"
+    out += "\n"
+
+    # Parameters
+    out += "/* Define the parameters */\n"
+    out += "numStudents = {};\n".format(len(participants))
+    out += "numDays     = {};\n".format(len(options_dict.keys()))
+    out += "numShifts   = {};\n".format(max_daily_shifts)
+    out += "\n"
+
+    # Output file
+    out += "/* Define the output file */\n"
+    out += "outFilepath = \"{}\";\n".format(outFilepath)
+    out += "\n"
+
+    # Student names
+    out += "/* Define the student names */\n"
+    out += "StudNames = #[\n"
+    for k, p_id in enumerate(participants.keys()):
+        if k == len(participants.keys())-1:
+            out += "    {}: \"{}\"\n".format(k+1, participants.get(p_id))
+        else:
+            out += "    {}: \"{}\",\n".format(k+1, participants.get(p_id))
+    out += "]#;\n"
+    out += "\n"
+
+    # Day names
+    out += "/* Define the day names */\n"
+    out += "DayNames = #[\n"
+    for k, d_name in enumerate(options_dict.keys()):
+        if k == len(options_dict.keys())-1:
+            out += "    {}: \"{}\"\n".format(k+1, d_name)
+        else:
+            out += "    {}: \"{}\",\n".format(k+1, d_name)
+    out += "]#;\n"
+    out += "\n"
+
+    # Existance of shifts
+    num_existing_shifts = 0
+    out += "/* Define the existing shifts */\n"
+    out += "Existance = #[\n"
+    for k, d_name in enumerate(options_dict.keys()):
+        string_array = []
+        for kk, s_name in enumerate(shift_names):
+            if s_name in options_dict.get(d_name):
+                string_array.append(1)
+                num_existing_shifts = num_existing_shifts + 1
+            else:
+                string_array.append(0)
+        if k == len(options_dict.keys())-1:
+            out += "    {}: {}\n".format(k+1, str(string_array))
+        else:
+            out += "    {}: {},\n".format(k+1, str(string_array))
+    out += "]#;"
+    out += "\n"
+
+    # Availability of students
+    out += "/* Define students availability */\n"
+    out += "Availability = [\n"
+    for k, p_id in enumerate(participants.keys()):
+        out += "    #[    /* {} */\n".format(participants.get(p_id))
+        for kk, d_name in enumerate(options_dict.keys()):
+            string_array = []
+            for kkk, s_name in enumerate(shift_names):
+                if calendar.get(d_name).get(s_name)!=None and p_id in calendar.get(d_name).get(s_name):
+                    string_array.append(1)
+                else:
+                    string_array.append(0)
+            if kk == len(options_dict.keys())-1:
+                out += "        {}:    {}    /* {} */\n".format(kk+1, str(string_array), d_name)
+            else:
+                out += "        {}:    {},   /* {} */\n".format(kk+1, str(string_array), d_name)
+        if k == len(participants.keys())-1:
+            out += "     ]#\n"
+        else:
+            out += "     ]#,\n"
+    out += "];\n"
+    out += "\n"
+
+    # Minimum number of shifts for each students
+    out += "/* Define the minimum number of shifts to assign at students */\n"
+    out += "MinNumShifts = #[\n"
+    for k, p_id in enumerate(partToMinShifts):
+        if partToMinShifts.get(p_id)[0] == None:
+            partToMinShifts[p_id] = (num_existing_shifts//len(participants), partToMinShifts.get(p_id)[1])
+        if k == len(partToMinShifts)-1:
+            out += "    {}: {}\n".format(k+1, partToMinShifts.get(p_id)[0])
+        else:
+            out += "    {}: {},\n".format(k+1, partToMinShifts.get(p_id)[0])
+    out += "]#;\n"
+    out += "\n"
+
+    # Maximum number of shifts for each students
+    out += "/* Define the max number of shifts to assign at students */\n"
+    out += "MaxNumShifts = #[\n"
+    for k, p_id in enumerate(partToMinShifts):
+        if partToMinShifts.get(p_id)[1] == None:
+            partToMinShifts[p_id] = (partToMinShifts.get(p_id)[0], max_num_shifts)
+        if k == len(partToMinShifts)-1:
+            out += "    {}: {}\n".format(k+1, partToMinShifts.get(p_id)[1])
+        else:
+            out += "    {}: {},\n".format(k+1, partToMinShifts.get(p_id)[1])
+    out += "]#;\n"
+    out += "\n"
+
+
+
+    # Write to output file
+    with open("test.dat", 'w') as f:
+        f.write(out)
     # create CSP problem
-    # partToMinShifts = ask_for_min_max_shifts(participants)
     # solve_with_constraints_lib(participants, options, calendar, partToMinShifts)

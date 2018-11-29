@@ -1,0 +1,109 @@
+****************************************************************
+*                  LIBRARY ROSTERING SOLUTION                  *
+****************************************************************
+*                                                              *
+*                        Berducci Luigi                        *
+*                Department of Computer Science                *
+*               University of Rome "La Sapienza"               *
+*                                                              *
+****************************************************************
+
+Solved using IBM ILOG CPLEX in 0.011334961 seconds
+
+Total number of shifts: 59
+Number of requested shifts: 45
+
+Day: 2018-12-03
+   Shift: 1 -> Student: Piccola Ketty
+   Shift: 2 -> Student: Libianchi Gabriele
+   Shift: 3 -> Student: Giorgio
+Day: 2018-12-04
+   Shift: 1 -> Student: Agostina
+   Shift: 2 -> Student: Andrea Coletta
+   Shift: 3 -> Student: Irene
+Day: 2018-12-05
+   Shift: 1 -> Student: Piccola Ketty
+   Shift: 2 -> Student: Irene
+   Shift: 3 -> Student: Luigi Berducci
+Day: 2018-12-06
+   Shift: 1 -> Student: Luigi Berducci
+   Shift: 2 -> Student: Andrea Coletta
+   Shift: 3 -> Student: Irene
+Day: 2018-12-07
+   Shift: 1 -> Student: Andrea Coletta
+   Shift: 2 -> Student: Filippo M
+Day: 2018-12-10
+   Shift: 1 -> Student: Piccola Ketty
+   Shift: 2 -> Student: Giorgio
+   Shift: 3 -> Student: Libianchi Gabriele
+Day: 2018-12-11
+   Shift: 1 -> Student: Libianchi Gabriele
+   Shift: 2 -> Student: Alessandro
+   Shift: 3 -> Student: Irene
+Day: 2018-12-12
+   Shift: 1 -> Student: Piccola Ketty
+   Shift: 2 -> Student: Libianchi Gabriele
+   Shift: 3 -> Student: Luigi Berducci
+Day: 2018-12-13
+   Shift: 1 -> Student: Alessandro
+   Shift: 2 -> Student: Luigi Berducci
+   Shift: 3 -> Student: Irene
+Day: 2018-12-14
+   Shift: 1 -> Student: Filippo M
+   Shift: 2 -> Student: Piccola Ketty
+Day: 2018-12-17
+   Shift: 1 -> Student: Piccola Ketty
+   Shift: 2 -> Student: Giorgio
+   Shift: 3 -> Student: Libianchi Gabriele
+Day: 2018-12-18
+   Shift: 1 -> Student: Andrea Coletta
+   Shift: 2 -> Student: Alessandro
+   Shift: 3 -> Student: Filippo M
+Day: 2018-12-19
+   Shift: 1 -> Student: Piccola Ketty
+   Shift: 2 -> Student: Alessandro
+   Shift: 3 -> Student: Libianchi Gabriele
+Day: 2018-12-20
+   Shift: 1 -> Student: Agostina
+   Shift: 2 -> Student: Andrea Coletta
+   Shift: 3 -> Student: Filippo M
+Day: 2018-12-21
+   Shift: 1 -> Student: Piccola Ketty
+   Shift: 2 -> Student: Filippo M
+Day: 2018-12-24
+   Shift: 1 -> Student: Piccola Ketty
+   Shift: 2 -> Student: Giorgio
+   Shift: 3 -> Student: Agostina
+Day: 2018-12-25
+   Shift: 1 -> Student: Alessandro
+   Shift: 2 -> Student: Andrea Coletta
+   Shift: 3 -> Student: Agostina
+Day: 2018-12-26
+   Shift: 1 -> Student: Piccola Ketty
+   Shift: 2 -> Student: Andrea Coletta
+   Shift: 3 -> Student: Luigi Berducci
+Day: 2018-12-27
+   Shift: 1 -> Student: Agostina
+   Shift: 2 -> Student: Andrea Coletta
+   Shift: 3 -> Student: Filippo M
+Day: 2018-12-28
+   Shift: 1 -> Student: Filippo M
+   Shift: 2 -> Student: Piccola Ketty
+Day: 2018-12-31
+   Shift: 1 -> Student: Agostina
+   Shift: 2 -> Student: Piccola Ketty
+   Shift: 3 -> Student: Giorgio
+
+****************************************************************
+*                        SUMMARY                               *
+****************************************************************
+        Student: Filippo M -> Shifts assigned: 7
+        Student: Agostina -> Shifts assigned: 6
+        Student: Giorgio -> Shifts assigned: 5
+        Student: Luigi Berducci -> Shifts assigned: 5
+        Student: Piccola Ketty -> Shifts assigned: 12
+        Student: Andrea Coletta -> Shifts assigned: 8
+        Student: Irene -> Shifts assigned: 5
+        Student: Alessandro -> Shifts assigned: 5
+        Student: Libianchi Gabriele -> Shifts assigned: 6
+****************************************************************

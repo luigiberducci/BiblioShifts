@@ -24,9 +24,6 @@
  string StudNames[students] = ...;
  string DayNames[days] 		= ...;
  
- /* Declare the output file where write the solution */
- string outFilepath			= ...;
- 
  /* Declare 3D array of availability */
  int Availability[students][days][shifts] = ...;
  
@@ -84,27 +81,24 @@
  }
  
  /***************************************************************************************/
- /*                              OUTPUT	SOLUTION TO FILE			   	                */
+ /*                              OUTPUT	SOLUTION TO STDOUT                              */
  /***************************************************************************************/
  execute { 
  	/* Take final time to compute statistics */
 	var after = new Date();
 	var elapsed = after.getTime()-temp; 
   
- 	/* Open the output file */
- 	var outputFile = new IloOplOutputFile(outFilepath);
- 	
  	/* Write header */
- 	outputFile.writeln("****************************************************************");
- 	outputFile.writeln("*                  LIBRARY ROSTERING SOLUTION                  *");
- 	outputFile.writeln("****************************************************************");
- 	outputFile.writeln("*                                                              *");
- 	outputFile.writeln("*                        Berducci Luigi                        *");
- 	outputFile.writeln("*                Department of Computer Science                *");
- 	outputFile.writeln("*               University of Rome \"La Sapienza\"               *");
- 	outputFile.writeln("*                                                              *");
- 	outputFile.writeln("****************************************************************");
- 	outputFile.writeln("\nSolved using IBM ILOG CPLEX in " + (elapsed/1000) + " seconds\n");
+ 	writeln("****************************************************************");
+ 	writeln("*                  LIBRARY ROSTERING SOLUTION                  *");
+ 	writeln("****************************************************************");
+ 	writeln("*                                                              *");
+ 	writeln("*                        Berducci Luigi                        *");
+ 	writeln("*                Department of Computer Science                *");
+ 	writeln("*               University of Rome \"La Sapienza\"               *");
+ 	writeln("*                                                              *");
+ 	writeln("****************************************************************");
+ 	writeln("\nSolved using IBM ILOG CPLEX in " + (elapsed/1000) + " seconds\n");
  
     var k_tot_shifts = 0;
     var k_min_shifts = 0;
@@ -119,26 +113,26 @@
     for(var s in thisOplModel.students){
         k_min_shifts += thisOplModel.MinNumShifts[s];
     }
-    outputFile.writeln("Total number of shifts: " + k_tot_shifts);
-    outputFile.writeln("Number of requested shifts: " + k_min_shifts);
-    outputFile.writeln("");
+    writeln("Total number of shifts: " + k_tot_shifts);
+    writeln("Number of requested shifts: " + k_min_shifts);
+    writeln("");
 
  	for(var d in thisOplModel.days){
- 		outputFile.writeln("Day: " + DayNames[d]); 	
+ 		writeln("Day: " + DayNames[d]); 	
 		for(var t in thisOplModel.shifts){
 			for(var s in thisOplModel.students){
 				if(thisOplModel.X[s][d][t] == 1){
-  					outputFile.writeln("   Shift: " + t + " -> Student: " + StudNames[s]);
+  					writeln("   Shift: " + t + " -> Student: " + StudNames[s]);
   				}												
  			}						
 		} 	 	
  	}
-    outputFile.writeln("");
+    writeln("");
 
 
- 	outputFile.writeln("****************************************************************");
- 	outputFile.writeln("*                        SUMMARY                               *");
- 	outputFile.writeln("****************************************************************");
+ 	writeln("****************************************************************");
+ 	writeln("*                        SUMMARY                               *");
+ 	writeln("****************************************************************");
     var tot = 0;
 	for(var s in thisOplModel.students){   
         tot = 0;
@@ -149,9 +143,7 @@
                 }
             }
         }
-        outputFile.writeln("        Student: " + StudNames[s] + " -> Shifts assigned: " + tot);
+        writeln("  Student: " + StudNames[s] + " -> Shifts assigned: " + tot);
     }
- 	outputFile.writeln("****************************************************************");
-
- 	outputFile.close();
- }
+ 	writeln("****************************************************************");
+}

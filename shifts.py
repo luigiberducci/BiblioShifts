@@ -97,8 +97,6 @@ def validate_value(n):
         exit(1)
     return n
 
-
-
 def ask_for_min_max_shifts(participants):
     """
     Asks the user to specify the minimum number of shifts to assign to each user.

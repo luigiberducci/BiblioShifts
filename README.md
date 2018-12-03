@@ -1,8 +1,12 @@
-# Turni biblioteca
+# BiblioShifts
 
-The following software is used to assign shifts to people that work in the CS dept. library of the University of Rome "La Sapienza".
+The following software is used to assign shifts to people that work in the CS Dept. library of the University of Rome "La Sapienza".
 
-It performs automatic rostering by first parsing data from a Doodle poll, then solve a Integer Linear Programming Problem to assign a poll participant to each option of the poll, according to expressed availabilities.
+It represents an extension of the `turni-biblioteca` software by Cristian Di Pierantonio, who modeled this problem as a CSP.
+
+This version performs automatic rostering by first parsing data from a Doodle poll, then solve a Integer Linear Programming Problem to assign a poll participant to each option of the poll, according to expressed availabilities. Finally, it produces a `xlsx` output file which contains an Excel representation of the computed assignment.
+
+Enjoy!
 
 ## Requirements
 
@@ -13,8 +17,8 @@ The following libraries must be installed:
 - [OPL](https://www.ibm.com/analytics/optimization-modeling) The problem is formulated using OPL
 - [XlsxWriter](https://xlsxwriter.readthedocs.io/) This Python package is used to write the output result
 
-All the listed softwares need to be properly configured according to the machine on which are executed.
-Notice that the CPLEX executable path has to be written in the config file because it will be invoked to solve the problem.
+All the above softwares need to be properly configured according to the machine on which are executed.
+Furthermore, the CPLEX executable path has to be written in the config file `config.in` because it will be invoked to solve the problem by the software.
 i
 ## Usage
 I tried to parametrize the program execution creating a configuration file `config.in`. It allows to define the input/output files, give a name to the problem and set the most appropriate model. Changing this file, you could also extend the software defining new models.

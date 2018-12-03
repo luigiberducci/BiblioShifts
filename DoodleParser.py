@@ -114,8 +114,10 @@ class DoodleParser:
         return (d, t)
 
 def format_date(d):
-    """ Format a datetime as yyyy-mm-dd """
-    return str(d.year) + "-" + str(d.month).zfill(2) + "-" + str(d.day).zfill(2)
+    """ Format a datetime `date` """
+    days   = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "July", "Ago", "Sep", "Oct", "Nov", "Dec"]
+    return days[d.weekday()] + " " + str(d.day).zfill(2) + " " + months[d.month-1]
 
 def format_time(d):
     """ Format a datetime as hh:mm """

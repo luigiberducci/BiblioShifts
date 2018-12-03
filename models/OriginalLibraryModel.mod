@@ -89,18 +89,61 @@
 	var elapsed = after.getTime()-temp; 
   
  	/* Write header */
- 	writeln("Elapsed time: " + (elapsed/1000) + " seconds\n");
- 	writeln("[Info] Begin output");
+ 	writeln("****************************************************************");
+ 	writeln("*                  LIBRARY ROSTERING SOLUTION                  *");
+ 	writeln("****************************************************************");
+ 	writeln("*                                                              *");
+ 	writeln("*                        Berducci Luigi                        *");
+ 	writeln("*                Department of Computer Science                *");
+ 	writeln("*               University of Rome \"La Sapienza\"               *");
+ 	writeln("*                                                              *");
+ 	writeln("****************************************************************");
+ 	writeln("\nSolved using IBM ILOG CPLEX in " + (elapsed/1000) + " seconds\n");
+ 
+    var k_tot_shifts = 0;
+    var k_min_shifts = 0;
+    for(var d in thisOplModel.days){
+        for(var t in thisOplModel.shifts){
+            if (thisOplModel.Existance[d][t]) {
+                k_tot_shifts += 1;
+            }
+        }
+    }
  	
+    for(var s in thisOplModel.students){
+        k_min_shifts += thisOplModel.MinNumShifts[s];
+    }
+    writeln("Total number of shifts: " + k_tot_shifts);
+    writeln("Number of requested shifts: " + k_min_shifts);
+    writeln("");
+
  	for(var d in thisOplModel.days){
+ 		writeln("Day: " + DayNames[d]); 	
 		for(var t in thisOplModel.shifts){
 			for(var s in thisOplModel.students){
 				if(thisOplModel.X[s][d][t] == 1){
-  					writeln(DayNames[d] + "," + t + "," + StudNames[s]);
+  					writeln("   Shift: " + t + " -> Student: " + StudNames[s]);
   				}												
  			}						
 		} 	 	
  	}
     writeln("");
-    writeln("[Info] End output");
+
+
+ 	writeln("****************************************************************");
+ 	writeln("*                        SUMMARY                               *");
+ 	writeln("****************************************************************");
+    var tot = 0;
+	for(var s in thisOplModel.students){   
+        tot = 0;
+        for (d in days){
+            for(t in shifts){
+                if(X[s][d][t] == 1){
+                    tot = tot + 1;
+                }
+            }
+        }
+        writeln("  Student: " + StudNames[s] + " -> Shifts assigned: " + tot);
+    }
+ 	writeln("****************************************************************");
 }

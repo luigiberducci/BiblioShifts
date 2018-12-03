@@ -5,6 +5,7 @@
 
 import sys
 import subprocess
+from subprocess import Popen, PIPE
 import datetime
 
 class Solver:
@@ -90,11 +91,10 @@ class Solver:
 
         # Header
         self.data_content += "/*********************************************\n"
-        self.data_content += " * OPL 12.8.0.0 Data\n"
-        self.data_content += " * Author: Luigi Berducci\n"
-        self.data_content += " * Creation Date: {}\n".format(datetime.date.today())
-        self.data_content += " * \n"
         self.data_content += " * Name: {}\n".format(self.problem)
+        self.data_content += " * This file is generated automatically\n"
+        self.data_content += " *\n"
+        self.data_content += " * Creation Date: {}\n".format(datetime.date.today())
         self.data_content += " *********************************************/\n"
         self.data_content += "\n"
 
@@ -212,11 +212,43 @@ class Solver:
         """
         Run OPLrun executable to solve the problem.
         """
-        print("Here")
         if self.opl_exe == "" or self.model_file == "" or self.data_file == "":
             return
-        print("Here")
-        subprocess.call([self.opl_exe, self.model_file, self.data_file])
+        # subprocess.call([self.opl_exe, self.model_file, self.data_file])
+        p = subprocess.Popen([self.opl_exe, self.model_file, self.data_file], stdout=PIPE)
+        out = p.communicate()
+
+        out_lines = str(out).split("\\n")
+        begin = 0
+        end   = len(out_lines)
+        for l, line in enumerate(out_lines):
+            if "[Info]" in line:    # Retrieve the delimiters lines, discarding the cplex output
+                if "Begin output" in line:  # Starting line
+                    begin = l
+                elif "End output" in line:  # Final line
+                    end   = l
+                else:
+                    continue
+
+        # Initialize result structure
+        result = dict()
+
+        # Return the result
+        for l, line in enumerate(out_lines[begin+1 : end]):
+            if line=="":
+                continue
+            split_line = line.split(",")
+
+            day     = split_line[0]
+            shift   = split_line[1]
+            student = split_line[2]
+
+            if result.get(day)==None:
+                result[day] = dict()
+
+            result[day][shift] = student
+
+        return result
 
 
     def get_result():

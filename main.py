@@ -5,6 +5,7 @@
 
 import sys
 import os
+import xlsxwriter
 from DoodleParser import DoodleParser
 from Solver import Solver
 
@@ -73,29 +74,118 @@ def ask_for_min_max_shifts(participants):
             minMaxShifts[p] = (validate_value(n[0]), validate_value(n[1]))
     return minMaxShifts
 
+def write_result_to_excel(result, output_file, problem_name):
+    """
+    Write the result in an Excel file.
+
+    Parameters:
+    -----------
+        -`result` a dict of dicts with structure day->shift->student
+        -`output_file` is the filename of output file
+    """
+    # Drawing parameters
+    interline  = 1
+    offset_inc = 3
+
+    columns = ["B", "C", "D", "E", "F", "G", "H"]
+    days    = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    skip_days = ["Sat", "Sun"]
+
+    rows    = ["1", "2", "3"]
+    shifts  = ["09:30", "12:30", "15:30"]
+
+    offset = 1
+    first_occurrence = True
+
+    my_workbook  = xlsxwriter.Workbook(output_file)
+    my_worksheet = my_workbook.add_worksheet()
+
+    # Header
+    my_worksheet.write("A1", "Automatic assignment for {}".format(problem_name))
+    offset = offset + 1
+    for dd, cc in zip(days, columns):
+        if dd in skip_days:
+            continue
+        my_worksheet.write( cc+str(offset), dd)
+    offset = offset + 1
+
+    for k, d in enumerate(result.keys()):
+        if d[0:3] in skip_days:
+            continue
+        if d.startswith("Mon") and first_occurrence:
+            first_occurrence = False
+            if k != 0:  # No increment on first week
+                offset = offset + offset_inc + interline
+
+            date = int(d.split(" ")[1])
+            for cc in columns:
+                if cc in [columns[days.index(d)] for d in skip_days]:
+                    continue
+                my_worksheet.write( cc+str(offset), date )
+                date = date + 1
+            for rr in rows:
+                my_worksheet.write( "A"+str(offset+int(rr)), shifts[rows.index(rr)] )
+
+
+        if d.startswith("Fri"):
+            first_occurrence = True
+
+        for k, t in enumerate(result.get(d)):
+            student = result.get(d).get(t)
+
+            current_col = columns[ days.index(d[0:3]) ]
+            current_row = str(offset + int(t))
+
+            print("Day {} - Shift {} -> {} | {}{}".format(d, t, student, current_col, current_row))
+
+            my_worksheet.write( current_col+current_row, student )
+
+
+    my_workbook.close()
+
 if __name__=="__main__":
     if len(sys.argv)<2:
         print("[Error] Invalid number of arguments.")
-        print("\tUsage: python3 {} <pollID>".format(sys.argv[0]))
+        print("\tUsage: python3 {} <pollID> [offline]".format(sys.argv[0]))
         exit(1)
+    elif len(sys.argv)>2:
+        if sys.argv[2]=="offline":
+            offline = True
+    else:
+        offline = False
 
+    # Take the input arguments and the data from config file
     pollID = sys.argv[1]
     parse_config_file(CONFIG_FILE)
+    output_filepath = os.path.join(CONF["out_dir"], CONF["out_file"])
+    model_filepath = os.path.join(CONF["model_dir"], CONF["model_file"])
+    data_filepath = os.path.join(CONF["data_dir"], CONF["data_file"])
 
-    parser = DoodleParser(pollID)
+    if not(offline):
+        # Parse the doodle survey
+        parser = DoodleParser(pollID)
 
-    numMinMaxShifts = ask_for_min_max_shifts(parser.get_participants())
+        # Ask to the user to specify the min, max number of shifts for each participant
+        numMinMaxShifts = ask_for_min_max_shifts(parser.get_participants())
 
+    # Create the solver
     solver = Solver(CONF["name"])
+
+    # Configure the solver
     solver.set_opl_exe(CONF["oplrun"])
-    solver.set_model(os.path.join(CONF["model_dir"], CONF["model_file"]))
-    solver.set_data(os.path.join(CONF["data_dir"], CONF["data_file"]))
-    solver.set_output_file(os.path.join(CONF["out_dir"], CONF["out_file"]))
+    solver.set_model(model_filepath)
+    solver.set_data(data_filepath)
+    solver.set_output_file(output_filepath)
 
-    solver.config_problem(parser.get_participants(),
-                          parser.get_options(),
-                          parser.get_calendar(),
-                          numMinMaxShifts)
+    if not(offline):
+        # Configure the problem and set data for participants, options, preferences and shifts
+        solver.config_problem(parser.get_participants(),
+                              parser.get_options(),
+                              parser.get_calendar(),
+                              numMinMaxShifts)
 
-    print("Run solver")
-    solver.solve()
+    # Run the solver
+    result = solver.solve()
+
+    # Save result
+    write_result_to_excel(result, output_filepath, CONF["name"])

@@ -221,7 +221,10 @@ class Solver:
         out_lines = str(out).split("\\n")
         begin = 0
         end   = len(out_lines)
+
         for l, line in enumerate(out_lines):
+            if "no solution" in line:   # Catch unsolvability
+                return ""
             if "[Info]" in line:    # Retrieve the delimiters lines, discarding the cplex output
                 if "Begin output" in line:  # Starting line
                     begin = l

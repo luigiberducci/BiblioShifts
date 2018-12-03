@@ -5,11 +5,26 @@
 #                               #
 #################################
 
+# This name is used for printing purposes 
+# I suggest to use a format: `month-name year`
 PROB_NAME="December 2018"
+
+# Define the path to `oplrun` exe
 OPLRUN="/opt/ibm/ILOG/CPLEX_Studio128/opl/bin/x86-64_linux/oplrun"
+
+# Folders of the project
+# I organized the software in 3 main dirs: `models`, `data`, `out`.
+# But you can define these folders as you prefer.
 OUT_DIR="out"
 MOD_DIR="models"
 DATA_DIR="data"
+
+# The first problem to issue (`PROB_1`) is the library rostering.
+# Then, define the model file
 MOD_PROB_1="Library.mod"
+# The Data file is created in `online mode` (polling Doodle and configuring the ILP problem). Instead, the Data file is used in `offline mode` to solve the problem. Then, it MUST exist to run the software with `offline` parameter.
 DATA_PROB_1="Test_Dec2018.dat"
+# Finally, the output file is created by the software at the end of execution and contain a precise representation of the assignment.
 OUT_PROB_1="Test_Dec2018.xlsx"
+
+# Future development, create a second problem (`PROB_2`) to minimize the number of journey to the library and to join as many shifts as you can.

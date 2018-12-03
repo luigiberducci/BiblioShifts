@@ -37,7 +37,7 @@ def validate_value(n):
     except ValueError:
         n = ""
     if n == "" or n < 0:
-        error("Error: input \"{}\" not valid.".format(n))
+        error("input \"{}\" not valid.".format(n))
         exit(1)
     return n
 
@@ -253,13 +253,15 @@ if __name__=="__main__":
     # Take final solve time
     tsf = time.time()
 
-    info("Write the result to Excel...\n")
+    if result == "":
+        error("The problem has no solution.\n")
+    else:
+        info("Write Excel result in {}...\n".format(output_filepath))
 
-    # Save result
-    write_result_to_excel(result, output_filepath, CONF["name"])
+        # Save result
+        write_result_to_excel(result, output_filepath, CONF["name"])
 
     # Take final time
     tf = time.time()
     info("Solver spent \t{0:.{digits}f} seconds.".format((tsf-ts0), digits=3))
     info("Program ends in \t{0:.{digits}f} seconds.".format((tf-t0), digits=3))
-    info("You can find the result in {}".format(output_filepath))

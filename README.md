@@ -20,6 +20,6 @@ i
 I tried to parametrize the program execution creating a configuration file `config.in`. It allows to define the input/output files, give a name to the problem and set the most appropriate model. Changing this file, you could also extend the software defining new models.
 
 To run the software, open the terminal, move to this directory and write:
-python3 main.py <poll-ID> [offline]
+`python3 main.py <poll-ID> [offline]`
 
 Once you pulled the Doodle poll and defined the model, the software creates a data file and then you never need to pull data from Doodle. Then, writing "offline" as third input parameter, the software skip this initial phase and run the solver starting from the data file currently defined.

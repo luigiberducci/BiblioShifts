@@ -74,6 +74,10 @@
  	  forall(s in students) 
         ( sum(d in days) sum(t in shifts) X[s][d][t] ) >= MinNumShifts[s];
  	  
+      /* Assign to each student at most the number of shifts defined in MaxNumShifts. */
+ 	  forall(s in students) 
+        ( sum(d in days) sum(t in shifts) X[s][d][t] ) <= MaxNumShifts[s];
+ 	  
  	  /* Each student can do at most one shift per day */
  	  forall(s in students)
  	    forall(d in days)

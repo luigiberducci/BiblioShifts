@@ -10,7 +10,8 @@
  /* Declare parameters */
  int numStudents = ...;	/* Total number of students */
  int numDays	 = ...; /* Total number of days, even if there are not all the shifts*/
- int numShifts	 = ...; /* Number of shifts per day, the maximum value */
+ int numShifts	 = ...; /* Number of shifts in a day */
+ int MaxNumShiftsPerDay = ...;  /* Max number of assignment to a student in the same day */
 
  /* Define helping variable "big M" */
  int BigM        = 1000;
@@ -20,9 +21,10 @@
  range days 	= 1..numDays;
  range shifts 	= 1..numShifts;
  
- /* Declare strings for student and day names (e.g. "Luigi Berducci", "Mon 01 Dec", ...)*/
+ /* Declare strings for student, day and shift names (e.g. "Luigi Berducci", "Mon 01 Dec", "09:30-10:30" ...) */
  string StudNames[students] = ...;
  string DayNames[days] 		= ...;
+ string ShiftNames[days] 		= ...;
  
  /* Declare 3D array of availability */
  int Availability[students][days][shifts] = ...;
@@ -49,16 +51,24 @@
  /* X[s][d][t] == 1, the shift t on day d is assigned to the student s */
  /* X[s][d][t] == 0, otherwise */
  dvar int X[students][days][shifts] in 0..1;
- 
+ /* AssignedShifts[s] is the number of shifts assigned to the student s (controlled redundancy) */
+ dvar int AssignedShifts[students];
+ /* AvgShifts is the average number of shifts assigned (controlled redundancy) */
+ dvar float AvgShifts;
+
  /* OBJECTIVE FUNCTION */
- /* Minimize the total number of assignment. 
- 	Note: This objective function is mandatory to avoid multiple assignment of the same shift.
- 	Otherwise we should add a constraint to unicity of assignment 
- 	but with this function is implicitly modeled. */
- minimize sum(s in students) sum(d in days) sum(t in shifts) X[s][d][t];
+ /* Minimize the mean variance to balance the number of assignment. */
+ minimize (1/numStudents)*sum(s in students) (AssignedShifts[s]-AvgShifts)^2;
  
  /* CONSTRAINTS */
  subject to {
+      /* Consistency definition of AssignedShifts[students] (redundancy) */
+      forall(s in students)
+        AssignedShifts[s] == sum(d in days) sum(t in shifts) X[s][d][t];
+
+      /* Consistency definition of AvgShifts (redundancy) */
+      AvgShifts == (1/numStudents)*sum(s in students) AssignedShifts[s];
+
  	  /* Assign each existing shift to only an available student. */
  	  forall(d in days)
  	    forall(t in shifts)
@@ -78,10 +88,10 @@
  	  forall(s in students) 
         ( sum(d in days) sum(t in shifts) X[s][d][t] ) <= MaxNumShifts[s];
  	  
- 	  /* Each student can do at most one shift per day */
+ 	  /* Each student can do at most a certain number of shifts per day */
  	  forall(s in students)
  	    forall(d in days)
- 	      ( sum(t in shifts) X[s][d][t] ) <= 1;
+ 	      ( sum(t in shifts) X[s][d][t] ) <= MaxNumShiftsPerDay;
  }
  
  /***************************************************************************************/
@@ -93,61 +103,19 @@
 	var elapsed = after.getTime()-temp; 
   
  	/* Write header */
- 	writeln("****************************************************************");
- 	writeln("*                  LIBRARY ROSTERING SOLUTION                  *");
- 	writeln("****************************************************************");
- 	writeln("*                                                              *");
- 	writeln("*                        Berducci Luigi                        *");
- 	writeln("*                Department of Computer Science                *");
- 	writeln("*               University of Rome \"La Sapienza\"               *");
- 	writeln("*                                                              *");
- 	writeln("****************************************************************");
- 	writeln("\nSolved using IBM ILOG CPLEX in " + (elapsed/1000) + " seconds\n");
- 
-    var k_tot_shifts = 0;
-    var k_min_shifts = 0;
-    for(var d in thisOplModel.days){
-        for(var t in thisOplModel.shifts){
-            if (thisOplModel.Existance[d][t]) {
-                k_tot_shifts += 1;
-            }
-        }
-    }
+ 	writeln("Elapsed time: " + (elapsed/1000) + " seconds\n");
+ 	writeln("[Info] Begin output");
  	
-    for(var s in thisOplModel.students){
-        k_min_shifts += thisOplModel.MinNumShifts[s];
-    }
-    writeln("Total number of shifts: " + k_tot_shifts);
-    writeln("Number of requested shifts: " + k_min_shifts);
-    writeln("");
-
  	for(var d in thisOplModel.days){
- 		writeln("Day: " + DayNames[d]); 	
 		for(var t in thisOplModel.shifts){
 			for(var s in thisOplModel.students){
 				if(thisOplModel.X[s][d][t] == 1){
-  					writeln("   Shift: " + t + " -> Student: " + StudNames[s]);
+  					writeln(DayNames[d] + "," + ShiftNames[t] + "," + StudNames[s]);
   				}												
  			}						
 		} 	 	
  	}
     writeln("");
 
-
- 	writeln("****************************************************************");
- 	writeln("*                        SUMMARY                               *");
- 	writeln("****************************************************************");
-    var tot = 0;
-	for(var s in thisOplModel.students){   
-        tot = 0;
-        for (d in days){
-            for(t in shifts){
-                if(X[s][d][t] == 1){
-                    tot = tot + 1;
-                }
-            }
-        }
-        writeln("  Student: " + StudNames[s] + " -> Shifts assigned: " + tot);
-    }
- 	writeln("****************************************************************");
+    writeln("[Info] End output");
 }

@@ -41,6 +41,17 @@ def validate_value(n):
         exit(1)
     return n
 
+def get_all_shifts(calendar):
+    """
+    Return a sorted set containing all the shifts which may occur in a single day.
+    """
+    shift_names = set()
+    for k, d in enumerate(calendar.keys()):
+        for k, t in enumerate(calendar.get(d).keys()):
+            shift_names.add(t)
+    return sorted(shift_names)
+
+
 def parse_config_file(configFile):
     """
     Extract variables from the config file given as input.
@@ -76,6 +87,20 @@ def parse_config_file(configFile):
                 CONF["out_file"] = split[1]
             else:
                 pass
+
+def ask_for_max_shifts_per_day():
+    """
+    Asks to user to specify the maximum number of shifts to assign to the same student in a day.
+
+    Returns:
+    --------
+        -`maxShiftsXDay` is and integer
+    """
+    maxShiftsXDay = 1
+    n = input(" $> Max number of shifts to assign to a student in the same day? (format: 'val', by default is 1)")
+    if n!="":
+        maxShiftsXDay = validate_value(n)
+    return maxShiftsXDay
 
 def ask_for_min_max_shifts(participants):
     """
@@ -116,8 +141,7 @@ def write_result_to_excel(result, output_file, problem_name):
     i_columns = [ 1,   2,   3,   4,   5 ]
     days      = ["Mon", "Tue", "Wed", "Thu", "Fri"]
 
-    rows    = ["1", "2", "3"]
-    shifts  = ["09:30", "12:30", "15:30"]
+    shifts  = get_all_shifts(result)
 
     offset = 1
     first_occurrence = True
@@ -161,9 +185,8 @@ def write_result_to_excel(result, output_file, problem_name):
                     break
                 my_worksheet.write( "{}{}".format(cc, str(offset)), date, bold_cnt_fmt)
                 date = date + 1
-            for rr in rows:
-                my_worksheet.write( "A{}".format(str(offset+int(rr))), shifts[rows.index(rr)], bold_cnt_fmt)
-
+            for rr, t in enumerate(shifts):
+                my_worksheet.write( "A{}".format(str(offset+rr+1)), t, bold_cnt_fmt)
 
         if d.startswith("Fri"):
             first_occurrence = True
@@ -175,7 +198,7 @@ def write_result_to_excel(result, output_file, problem_name):
             students_stat[student] = students_stat.get(student) + 1 # Increment counter
 
             current_col = columns[ days.index(d[0:3]) ]
-            current_row = str(offset + int(t))
+            current_row = str(offset + shifts.index(t) + 1)
 
             my_worksheet.write( "{}{}".format(current_col, current_row), student )
 
@@ -226,6 +249,7 @@ if __name__=="__main__":
 
         # Ask to the user to specify the min, max number of shifts for each participant
         numMinMaxShifts = ask_for_min_max_shifts(parser.get_participants())
+        numMaxShiftsPerDay = ask_for_max_shifts_per_day()
 
     # Create the solver
     solver = Solver(CONF["name"])
@@ -241,7 +265,7 @@ if __name__=="__main__":
         solver.config_problem(parser.get_participants(),
                               parser.get_options(),
                               parser.get_calendar(),
-                              numMinMaxShifts)
+                              numMinMaxShifts, numMaxShiftsPerDay)
 
     info("Configure Solver...\tDONE\n")
     info("Run the solver!")

@@ -2,13 +2,15 @@
  * Name: December 2018
  * This file is generated automatically
  *
- * Creation Date: 2018-12-03
+ * Creation Date: 2018-12-04
  *********************************************/
 
 /* Define the parameters */
 numStudents = 10;
 numDays     = 21;
 numShifts   = 3;
+
+MaxNumShiftsPerDay = 1;
 
 /* Define the student names */
 StudNames = #[
@@ -49,29 +51,36 @@ DayNames = #[
     21: "Mon 31 Dec"
 ]#;
 
+/* Define the shift names */
+ShiftNames = #[
+    1: "09:30",
+    2: "12:30",
+    3: "15:30"
+]#;
+
 /* Define the existing shifts */
 Existance = #[
-    1: [1, 1, 1],
-    2: [1, 1, 1],
-    3: [1, 1, 1],
-    4: [1, 1, 1],
-    5: [1, 1, 0],
-    6: [1, 1, 1],
-    7: [1, 1, 1],
-    8: [1, 1, 1],
-    9: [1, 1, 1],
-    10: [1, 1, 0],
-    11: [1, 1, 1],
-    12: [1, 1, 1],
-    13: [1, 1, 1],
-    14: [1, 1, 1],
-    15: [1, 1, 0],
-    16: [1, 1, 1],
-    17: [1, 1, 1],
-    18: [1, 1, 1],
-    19: [1, 1, 1],
-    20: [1, 1, 0],
-    21: [1, 1, 1]
+    1: [1, 1, 1],   /* Mon 03 Dec */
+    2: [1, 1, 1],   /* Tue 04 Dec */
+    3: [1, 1, 1],   /* Wed 05 Dec */
+    4: [1, 1, 1],   /* Thu 06 Dec */
+    5: [1, 1, 0],   /* Fri 07 Dec */
+    6: [1, 1, 1],   /* Mon 10 Dec */
+    7: [1, 1, 1],   /* Tue 11 Dec */
+    8: [1, 1, 1],   /* Wed 12 Dec */
+    9: [1, 1, 1],   /* Thu 13 Dec */
+    10: [1, 1, 0],   /* Fri 14 Dec */
+    11: [1, 1, 1],   /* Mon 17 Dec */
+    12: [1, 1, 1],   /* Tue 18 Dec */
+    13: [1, 1, 1],   /* Wed 19 Dec */
+    14: [1, 1, 1],   /* Thu 20 Dec */
+    15: [1, 1, 0],   /* Fri 21 Dec */
+    16: [1, 1, 1],   /* Mon 24 Dec */
+    17: [1, 1, 1],   /* Tue 25 Dec */
+    18: [1, 1, 1],   /* Wed 26 Dec */
+    19: [1, 1, 1],   /* Thu 27 Dec */
+    20: [1, 1, 0],   /* Fri 28 Dec */
+    21: [1, 1, 1]    /* Mon 31 Dec */
 ]#;
 /* Define students availability */
 Availability = [
@@ -309,29 +318,29 @@ Availability = [
 
 /* Define the minimum number of shifts to assign to students */
 MinNumShifts = #[
-    1: 5,
-    2: 5,
-    3: 5,
-    4: 5,
-    5: 5,
-    6: 5,
-    7: 5,
-    8: 5,
-    9: 5,
-    10: 5
+    1: 0,   /* Filippo M */
+    2: 0,   /* Agostina */
+    3: 0,   /* Giorgio */
+    4: 0,   /* Luigi Berducci */
+    5: 0,   /* Piccola Ketty */
+    6: 0,   /* Andrea Coletta */
+    7: 0,   /* Irene */
+    8: 0,   /* Alessandro */
+    9: 0,   /* Libianchi Gabriele */
+    10: 0    /* Utente Prova */
 ]#;
 
 /* Define the max number of shifts to assign to students */
 MaxNumShifts = #[
-    1: 59,
-    2: 59,
-    3: 59,
-    4: 59,
-    5: 59,
-    6: 59,
-    7: 59,
-    8: 59,
-    9: 59,
-    10: 59
+    1: 59,   /* Filippo M */
+    2: 59,   /* Agostina */
+    3: 59,   /* Giorgio */
+    4: 59,   /* Luigi Berducci */
+    5: 59,   /* Piccola Ketty */
+    6: 59,   /* Andrea Coletta */
+    7: 59,   /* Irene */
+    8: 59,   /* Alessandro */
+    9: 59,   /* Libianchi Gabriele */
+    10: 59    /* Utente Prova */
 ]#;
 

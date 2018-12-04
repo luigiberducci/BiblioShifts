@@ -71,7 +71,7 @@ class Solver:
         """
         self.output_file = outputPath
 
-    def config_problem(self, participants, options, calendar, minMaxShifts):
+    def config_problem(self, participants, options, calendar, minMaxShifts, maxShiftsPerDay):
         """
         Create a data file according to the given input.
 
@@ -104,6 +104,8 @@ class Solver:
         self.data_content += "numDays     = {};\n".format(len(options.keys()))
         self.data_content += "numShifts   = {};\n".format(len(all_shifts))
         self.data_content += "\n"
+        self.data_content += "MaxNumShiftsPerDay = {};\n".format(maxShiftsPerDay)
+        self.data_content += "\n"
 
         # Student names
         self.data_content += "/* Define the student names */\n"
@@ -127,6 +129,18 @@ class Solver:
         self.data_content += "]#;\n"
         self.data_content += "\n"
 
+        # Shift names
+        self.data_content += "/* Define the shift names */\n"
+        self.data_content += "ShiftNames = #[\n"
+        for k, t_name in enumerate(all_shifts):
+            if k == len(all_shifts)-1:
+                self.data_content += "    {}: \"{}\"\n".format(k+1, t_name)
+            else:
+                self.data_content += "    {}: \"{}\",\n".format(k+1, t_name)
+        self.data_content += "]#;\n"
+        self.data_content += "\n"
+
+
         # Existance of shifts
         num_existing_shifts = 0
         self.data_content += "/* Define the existing shifts */\n"
@@ -134,15 +148,15 @@ class Solver:
         for k, d_name in enumerate(options.keys()):
             string_array = []
             for kk, s_name in enumerate(all_shifts):
-                if s_name in options.get(d_name):
+                if s_name in options.get(d_name) and len(calendar.get(d_name).get(s_name))>0:
                     string_array.append(1)
                     num_existing_shifts = num_existing_shifts + 1
                 else:
                     string_array.append(0)
             if k == len(options.keys())-1:
-                self.data_content += "    {}: {}\n".format(k+1, str(string_array))
+                self.data_content += "    {}: {}    /* {} */\n".format(k+1, str(string_array), d_name)
             else:
-                self.data_content += "    {}: {},\n".format(k+1, str(string_array))
+                self.data_content += "    {}: {},   /* {} */\n".format(k+1, str(string_array), d_name)
         self.data_content += "]#;"
         self.data_content += "\n"
 
@@ -179,27 +193,26 @@ class Solver:
         # Minimum number of shifts for each students
         self.data_content += "/* Define the minimum number of shifts to assign to students */\n"
         self.data_content += "MinNumShifts = #[\n"
-        for k, p_id in enumerate(minMaxShifts):
-            if minMaxShifts.get(p_id)[0] == None:
-                minMaxShifts[p_id] = (num_remaining_shifts//len(participants),
-                                      minMaxShifts.get(p_id)[1])
+        for k, p in enumerate(minMaxShifts):
+            if minMaxShifts.get(p)[0] == None:
+                minMaxShifts[p] = (0, minMaxShifts.get(p)[1])
             if k == len(minMaxShifts)-1:
-                self.data_content += "    {}: {}\n".format(k+1, minMaxShifts.get(p_id)[0])
+                self.data_content += "    {}: {}    /* {} */\n".format(k+1, minMaxShifts.get(p)[0], p)
             else:
-                self.data_content += "    {}: {},\n".format(k+1, minMaxShifts.get(p_id)[0])
+                self.data_content += "    {}: {},   /* {} */\n".format(k+1, minMaxShifts.get(p)[0], p)
         self.data_content += "]#;\n"
         self.data_content += "\n"
 
         # Maximum number of shifts for each students
         self.data_content += "/* Define the max number of shifts to assign to students */\n"
         self.data_content += "MaxNumShifts = #[\n"
-        for k, p_id in enumerate(minMaxShifts):
-            if minMaxShifts.get(p_id)[1] == None:
-                minMaxShifts[p_id] = (minMaxShifts.get(p_id)[0], num_existing_shifts)
+        for k, p in enumerate(minMaxShifts):
+            if minMaxShifts.get(p)[1] == None:
+                minMaxShifts[p] = (minMaxShifts.get(p)[0], num_existing_shifts)
             if k == len(minMaxShifts)-1:
-                self.data_content += "    {}: {}\n".format(k+1, minMaxShifts.get(p_id)[1])
+                self.data_content += "    {}: {}    /* {} */\n".format(k+1, minMaxShifts.get(p)[1], p)
             else:
-                self.data_content += "    {}: {},\n".format(k+1, minMaxShifts.get(p_id)[1])
+                self.data_content += "    {}: {},   /* {} */\n".format(k+1, minMaxShifts.get(p)[1], p)
         self.data_content += "]#;\n"
         self.data_content += "\n"
 

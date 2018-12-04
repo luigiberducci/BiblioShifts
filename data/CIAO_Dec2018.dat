@@ -1,0 +1,173 @@
+/*********************************************
+ * Name: December 2018
+ * This file is generated automatically
+ *
+ * Creation Date: 2018-12-04
+ *********************************************/
+
+/* Define the parameters */
+numStudents = 5;
+numDays     = 15;
+numShifts   = 2;
+
+MaxNumShiftsPerDay = 2;
+
+/* Define the student names */
+StudNames = #[
+    1: "Giulia",
+    2: "Agnese",
+    3: "Martina",
+    4: "Elisa",
+    5: "Paolo"
+]#;
+
+/* Define the day names */
+DayNames = #[
+    1: "Mon 03 Dec",
+    2: "Tue 04 Dec",
+    3: "Wed 05 Dec",
+    4: "Thu 06 Dec",
+    5: "Fri 07 Dec",
+    6: "Mon 10 Dec",
+    7: "Tue 11 Dec",
+    8: "Wed 12 Dec",
+    9: "Thu 13 Dec",
+    10: "Fri 14 Dec",
+    11: "Mon 17 Dec",
+    12: "Tue 18 Dec",
+    13: "Wed 19 Dec",
+    14: "Thu 20 Dec",
+    15: "Fri 21 Dec"
+]#;
+
+/* Define the shift names */
+ShiftNames = #[
+    1: "10:00",
+    2: "14:00"
+]#;
+
+/* Define the existing shifts */
+Existance = #[
+    1: [0, 1],   /* Mon 03 Dec */
+    2: [1, 1],   /* Tue 04 Dec */
+    3: [1, 1],   /* Wed 05 Dec */
+    4: [1, 1],   /* Thu 06 Dec */
+    5: [1, 1],   /* Fri 07 Dec */
+    6: [1, 1],   /* Mon 10 Dec */
+    7: [1, 1],   /* Tue 11 Dec */
+    8: [1, 1],   /* Wed 12 Dec */
+    9: [1, 0],   /* Thu 13 Dec */
+    10: [1, 1],   /* Fri 14 Dec */
+    11: [1, 1],   /* Mon 17 Dec */
+    12: [0, 1],   /* Tue 18 Dec */
+    13: [1, 1],   /* Wed 19 Dec */
+    14: [0, 0],   /* Thu 20 Dec */
+    15: [0, 1]    /* Fri 21 Dec */
+]#;
+/* Define students availability */
+Availability = [
+    #[    /* Giulia */
+        1:    [0, 1],   /* Mon 03 Dec */
+        2:    [0, 1],   /* Tue 04 Dec */
+        3:    [1, 1],   /* Wed 05 Dec */
+        4:    [0, 0],   /* Thu 06 Dec */
+        5:    [0, 1],   /* Fri 07 Dec */
+        6:    [0, 1],   /* Mon 10 Dec */
+        7:    [0, 1],   /* Tue 11 Dec */
+        8:    [1, 1],   /* Wed 12 Dec */
+        9:    [0, 0],   /* Thu 13 Dec */
+        10:    [0, 1],   /* Fri 14 Dec */
+        11:    [0, 1],   /* Mon 17 Dec */
+        12:    [0, 1],   /* Tue 18 Dec */
+        13:    [1, 1],   /* Wed 19 Dec */
+        14:    [0, 0],   /* Thu 20 Dec */
+        15:    [0, 1]    /* Fri 21 Dec */
+     ]#,
+    #[    /* Agnese */
+        1:    [0, 0],   /* Mon 03 Dec */
+        2:    [1, 0],   /* Tue 04 Dec */
+        3:    [0, 0],   /* Wed 05 Dec */
+        4:    [0, 0],   /* Thu 06 Dec */
+        5:    [0, 0],   /* Fri 07 Dec */
+        6:    [0, 0],   /* Mon 10 Dec */
+        7:    [0, 0],   /* Tue 11 Dec */
+        8:    [0, 0],   /* Wed 12 Dec */
+        9:    [0, 0],   /* Thu 13 Dec */
+        10:    [0, 0],   /* Fri 14 Dec */
+        11:    [0, 0],   /* Mon 17 Dec */
+        12:    [0, 0],   /* Tue 18 Dec */
+        13:    [0, 0],   /* Wed 19 Dec */
+        14:    [0, 0],   /* Thu 20 Dec */
+        15:    [0, 0]    /* Fri 21 Dec */
+     ]#,
+    #[    /* Martina */
+        1:    [0, 0],   /* Mon 03 Dec */
+        2:    [0, 0],   /* Tue 04 Dec */
+        3:    [0, 0],   /* Wed 05 Dec */
+        4:    [0, 0],   /* Thu 06 Dec */
+        5:    [1, 1],   /* Fri 07 Dec */
+        6:    [1, 1],   /* Mon 10 Dec */
+        7:    [0, 0],   /* Tue 11 Dec */
+        8:    [0, 0],   /* Wed 12 Dec */
+        9:    [0, 0],   /* Thu 13 Dec */
+        10:    [0, 0],   /* Fri 14 Dec */
+        11:    [0, 0],   /* Mon 17 Dec */
+        12:    [0, 0],   /* Tue 18 Dec */
+        13:    [0, 0],   /* Wed 19 Dec */
+        14:    [0, 0],   /* Thu 20 Dec */
+        15:    [0, 0]    /* Fri 21 Dec */
+     ]#,
+    #[    /* Elisa */
+        1:    [0, 0],   /* Mon 03 Dec */
+        2:    [0, 0],   /* Tue 04 Dec */
+        3:    [1, 0],   /* Wed 05 Dec */
+        4:    [0, 0],   /* Thu 06 Dec */
+        5:    [0, 0],   /* Fri 07 Dec */
+        6:    [0, 0],   /* Mon 10 Dec */
+        7:    [0, 0],   /* Tue 11 Dec */
+        8:    [0, 0],   /* Wed 12 Dec */
+        9:    [0, 0],   /* Thu 13 Dec */
+        10:    [0, 0],   /* Fri 14 Dec */
+        11:    [1, 0],   /* Mon 17 Dec */
+        12:    [0, 0],   /* Tue 18 Dec */
+        13:    [0, 0],   /* Wed 19 Dec */
+        14:    [0, 0],   /* Thu 20 Dec */
+        15:    [0, 0]    /* Fri 21 Dec */
+     ]#,
+    #[    /* Paolo */
+        1:    [0, 0],   /* Mon 03 Dec */
+        2:    [1, 1],   /* Tue 04 Dec */
+        3:    [0, 0],   /* Wed 05 Dec */
+        4:    [1, 1],   /* Thu 06 Dec */
+        5:    [1, 0],   /* Fri 07 Dec */
+        6:    [1, 0],   /* Mon 10 Dec */
+        7:    [1, 0],   /* Tue 11 Dec */
+        8:    [1, 0],   /* Wed 12 Dec */
+        9:    [1, 0],   /* Thu 13 Dec */
+        10:    [1, 0],   /* Fri 14 Dec */
+        11:    [0, 0],   /* Mon 17 Dec */
+        12:    [0, 0],   /* Tue 18 Dec */
+        13:    [0, 0],   /* Wed 19 Dec */
+        14:    [0, 0],   /* Thu 20 Dec */
+        15:    [0, 0]    /* Fri 21 Dec */
+     ]#
+];
+
+/* Define the minimum number of shifts to assign to students */
+MinNumShifts = #[
+    1: 0,   /* Giulia */
+    2: 0,   /* Agnese */
+    3: 0,   /* Martina */
+    4: 0,   /* Elisa */
+    5: 0    /* Paolo */
+]#;
+
+/* Define the max number of shifts to assign to students */
+MaxNumShifts = #[
+    1: 24,   /* Giulia */
+    2: 24,   /* Agnese */
+    3: 24,   /* Martina */
+    4: 24,   /* Elisa */
+    5: 24    /* Paolo */
+]#;
+

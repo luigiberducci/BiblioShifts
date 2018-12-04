@@ -21,10 +21,16 @@ DATA_DIR="data"
 
 # The first problem to issue (`PROB_1`) is the library rostering.
 # Then, define the model file
-MOD_PROB_1="Library.mod"
+MOD_PROB_1="LibraryModel_getCSV.mod"
+
 # The Data file is created in `online mode` (polling Doodle and configuring the ILP problem). Instead, the Data file is used in `offline mode` to solve the problem. Then, it MUST exist to run the software with `offline` parameter.
-DATA_PROB_1="Test_Dec2018.dat"
+# DATA_PROB_1="CIAO_Shifts_Agnese.dat"
+DATA_PROB_1="CSLibrary_Dec2018.dat"
+# DATA_PROB_1="CIAO_Dec2018.dat"
+
 # Finally, the output file is created by the software at the end of execution and contain a precise representation of the assignment.
-OUT_PROB_1="Test_Dec2018.xlsx"
+# OUT_PROB_1="CIAO_Shifts_Agnese.xlsx"
+OUT_PROB_1="CSLibrary_Dec2018.xlsx"
+# OUT_PROB_1="CIAO_Dec2018.xlsx"
 
 # Future development, create a second problem (`PROB_2`) to minimize the number of journey to the library and to join as many shifts as you can.

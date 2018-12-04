@@ -8,6 +8,12 @@ This version performs automatic rostering by first parsing data from a Doodle po
 
 Enjoy!
 
+UPDATE 04.12.2018: Changed the model introducing and objective function which improves load balancing. It is defined as minimization of mean variance, formally: 
+`1/n*sum_{s in students} (number_of_shifts_assigned_to[s] - avg_shifts_assigned)^2`
+where 
+    -`number_of_shifts_assigned_to[s]` is the number of shifts assigned to the student `s`
+    -`avg_shifts_assigned` is computed as `total_number_of_shifts`/`number_of_students`
+
 ## Requirements
 
 The following libraries must be installed:

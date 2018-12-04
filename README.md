@@ -13,6 +13,7 @@ UPDATE 04.12.2018: Changed the model introducing and objective function which im
 where 
     -`number_of_shifts_assigned_to[s]` is the number of shifts assigned to the student `s`
     -`avg_shifts_assigned` is computed as `total_number_of_shifts`/`number_of_students`
+Notice that this update make the current model NOT LINEAR but since CPLEX supports quadratic objective function, this is still efficiently solver.
 
 ## Requirements
 

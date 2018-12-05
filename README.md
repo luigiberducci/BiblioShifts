@@ -2,7 +2,7 @@
 
 The following software is used to assign shifts to people that work in the CS Dept. library of the University of Rome "La Sapienza".
 
-It represents an extension of the `turni-biblioteca` software by Cristian Di Pierantonio, who modeled this problem as a CSP.
+It represents an extension of the [turni-biblioteca](https://github.com/Halolegend94/turni-biblioteca) project by *Cristian Di Pierantonio*, who modeled this problem as a CSP.
 
 This version performs automatic rostering by first parsing data from a Doodle poll, then solve a Integer Linear Programming Problem to assign a poll participant to each option of the poll, according to expressed availabilities. Finally, it produces a `xlsx` output file which contains an Excel representation of the computed assignment.
 

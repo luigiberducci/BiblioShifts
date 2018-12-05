@@ -10,7 +10,7 @@ numStudents = 11;
 numDays     = 21;
 numShifts   = 3;
 
-MaxNumShiftsPerDay = 1;
+MaxNumShiftsPerDay = 3;
 
 /* Define the student names */
 StudNames = #[
@@ -342,31 +342,31 @@ Availability = [
 
 /* Define the minimum number of shifts to assign to students */
 MinNumShifts = #[
-    1: 0,   /* Filippo M */
-    2: 0,   /* Agostina */
-    3: 0,   /* Giorgio */
-    4: 0,   /* Luigi Berducci */
-    5: 0,   /* Piccola Ketty */
-    6: 0,   /* Andrea Coletta */
-    7: 0,   /* Irene */
-    8: 0,   /* Alessandro */
-    9: 0,   /* Libianchi Gabriele */
-    10: 0,   /* Utente Prova */
-    11: 0    /* Utente Prova 2 */
+    1: 5,   /* Filippo M */
+    2: 5,   /* Agostina */
+    3: 2,   /* Giorgio */
+    4: 5,   /* Luigi Berducci */
+    5: 5,   /* Piccola Ketty */
+    6: 5,   /* Andrea Coletta */
+    7: 5,   /* Irene */
+    8: 5,   /* Alessandro */
+    9: 5,   /* Libianchi Gabriele */
+    10: 5,   /* Utente Prova */
+    11: 5    /* Utente Prova 2 */
 ]#;
 
 /* Define the max number of shifts to assign to students */
 MaxNumShifts = #[
-    1: 59,   /* Filippo M */
-    2: 59,   /* Agostina */
+    1: 6,   /* Filippo M */
+    2: 6,   /* Agostina */
     3: 59,   /* Giorgio */
-    4: 59,   /* Luigi Berducci */
-    5: 59,   /* Piccola Ketty */
-    6: 59,   /* Andrea Coletta */
-    7: 59,   /* Irene */
-    8: 59,   /* Alessandro */
-    9: 59,   /* Libianchi Gabriele */
-    10: 59,   /* Utente Prova */
-    11: 59    /* Utente Prova 2 */
+    4: 6,   /* Luigi Berducci */
+    5: 6,   /* Piccola Ketty */
+    6: 6,   /* Andrea Coletta */
+    7: 6,   /* Irene */
+    8: 6,   /* Alessandro */
+    9: 6,   /* Libianchi Gabriele */
+    10: 6,   /* Utente Prova */
+    11: 6    /* Utente Prova 2 */
 ]#;
 

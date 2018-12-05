@@ -3,6 +3,7 @@
 # Author:   Luigi Berducci
 # Date:     2018-11-30
 
+import argparse
 import sys
 import os
 import xlsxwriter
@@ -85,6 +86,12 @@ def parse_config_file(configFile):
                 CONF["data_file"] = split[1]
             elif split[0]=="OUT_PROB_1":
                 CONF["out_file"] = split[1]
+            elif split[0]=="MOD_PROB_2":
+                CONF["model_file_min_trips"] = split[1]
+            elif split[0]=="DATA_PROB_2":
+                CONF["data_file_min_trips"] = split[1]
+            elif split[0]=="OUT_PROB_2":
+                CONF["out_file_min_trips"] = split[1]
             else:
                 pass
 
@@ -218,49 +225,45 @@ def write_result_to_excel(result, output_file, problem_name):
 
     my_workbook.close()
 
-if __name__=="__main__":
-    if len(sys.argv)<2:
-        error("Invalid number of arguments.\n" +
-              "\tUsage: python3 {} <pollID> [offline]".format(sys.argv[0]))
-        exit(1)
-    elif len(sys.argv)>2:
-        if sys.argv[2]=="offline":
-            offline = True
-    else:
-        offline = False
+def run_all_process(problem_name, model_filepath, data_filepath, output_filepath, offline, opl_exe_path, parser):
+    """
+    Run the entire process: Doodle parsing, run the solver and output writing.
 
-    # Take init time, for statistics purposes
-    t0 = time.time()
-
-    # Take the input arguments and the data from config file
-    pollID = sys.argv[1]
-    parse_config_file(CONFIG_FILE)
-    output_filepath = os.path.join(CONF["out_dir"], CONF["out_file"])
-    model_filepath = os.path.join(CONF["model_dir"], CONF["model_file"])
-    data_filepath = os.path.join(CONF["data_dir"], CONF["data_file"])
+    Parameters:
+    -----------
+        -`problem_name` is the string identifier for the current problem
+        -`model_filepath` is the path to the mod file
+        -`data_filepath` is the path to the dat file
+        -`output_filepath` is the path to the output file (create it or overwrite)
+        -`offline` is a boolean flag to enable the new data creation or use the existing one
+        -`opl_exe_path` is the path to the OPL executable
+        -`parser` is the DoodleParser object which collects info on participants, calendar, ...
+    """
+    assert(problem_name),    "Problem name is not defined"
+    assert(model_filepath),  "Model file not defined"
+    assert(data_filepath),   "Data file not defined"
+    assert(output_filepath), "Output file not defined"
+    assert(opl_exe_path),    "OPL exe not defined"
+    assert(not(offline) or parser==None), "Offline/Parser inconsistency"    # if offline then parser==None
+    assert(offline or parser!=None),      "Offline/Parser inconsistency"    # if not(offline) then parser!=None
 
     info("Initial configuration...\tDONE")
 
-    if not(offline):
-        # Parse the doodle survey
-        parser = DoodleParser(pollID)
-
-        info("Parsing Doodle...\tDONE")
-
+    if not(offline) and parser!=None:
         # Ask to the user to specify the min, max number of shifts for each participant
         numMinMaxShifts = ask_for_min_max_shifts(parser.get_participants())
         numMaxShiftsPerDay = ask_for_max_shifts_per_day()
 
     # Create the solver
-    solver = Solver(CONF["name"])
+    solver = Solver(problem_name)
 
     # Configure the solver
-    solver.set_opl_exe(CONF["oplrun"])
+    solver.set_opl_exe(opl_exe_path)
     solver.set_model(model_filepath)
     solver.set_data(data_filepath)
     solver.set_output_file(output_filepath)
 
-    if not(offline):
+    if not(offline) and parser!=None:
         # Configure the problem and set data for participants, options, preferences and shifts
         solver.config_problem(parser.get_participants(),
                               parser.get_options(),
@@ -268,24 +271,85 @@ if __name__=="__main__":
                               numMinMaxShifts, numMaxShiftsPerDay)
 
     info("Configure Solver...\tDONE\n")
-    info("Run the solver!")
+    info("Run the solver!\n")
 
     # Take init solve time
     ts0 = time.time()
     # Run the solver
-    result = solver.solve()
+    opt_val, result = solver.solve()
     # Take final solve time
     tsf = time.time()
 
-    if result == "":
+    if opt_val==None or result == "":   # Something goes wrong in solving
         error("The problem has no solution.\n")
     else:
+        info("Objective function: {}".format(opt_val))
         info("Write Excel result in {}...\n".format(output_filepath))
 
         # Save result
         write_result_to_excel(result, output_filepath, CONF["name"])
 
-    # Take final time
-    tf = time.time()
+    # Print statistic info about elapsed time
     info("Solver spent \t{0:.{digits}f} seconds.".format((tsf-ts0), digits=3))
+
+if __name__=="__main__":
+    # Default parameters' assignment
+    execProblem1 = True
+    execProblem2 = True
+    offline      = False
+
+    # Retrieve input arguments
+    argParser = argparse.ArgumentParser()
+
+    argParser.add_argument("pollID",    help="poll identifier, take it from the Doodle link")
+    argParser.add_argument("--offline", help="no access to Doodle, use the existing dat file", action="store_true")
+    argParser.add_argument("--problem", help="select the problem you want to solve", type=int)
+
+    args =  argParser.parse_args()
+
+    if args.offline==True:
+        offline = True
+    if args.problem==1:
+        execProblem1 = True
+        execProblem2 = False
+    elif args.problem==2:
+        execProblem1 = False
+        execProblem2 = True
+
+    # Take init time, for statistics purposes
+    t0 = time.time()
+
+    # Take the input arguments and the data from config file
+    pollID = sys.argv[1]
+    parse_config_file(CONFIG_FILE)
+
+    # Retrieve global information from config file
+    problem_name = CONF["name"]
+    opl_exe_path = CONF["oplrun"]
+
+    # Doodle Parsing
+    if not(offline):
+        # Parse the doodle survey
+        parser = DoodleParser(pollID)
+        info("Parsing Doodle...\tDONE")
+    else:
+        parser = None
+
+    # PROBLEM 1 : Balanced distribution
+    if(execProblem1):
+        output_filepath = os.path.join(CONF["out_dir"],   CONF["out_file"])
+        model_filepath  = os.path.join(CONF["model_dir"], CONF["model_file"])
+        data_filepath   = os.path.join(CONF["data_dir"],  CONF["data_file"])
+        # Start the solving of PROBLEM 1
+        run_all_process(problem_name, model_filepath, data_filepath, output_filepath, offline, opl_exe_path, parser)
+
+    # PROBLEM 2 : Minimize trips
+    if(execProblem2):
+        output_filepath = os.path.join(CONF["out_dir"],   CONF["out_file_min_trips"])
+        model_filepath  = os.path.join(CONF["model_dir"], CONF["model_file_min_trips"])
+        data_filepath   = os.path.join(CONF["data_dir"],  CONF["data_file_min_trips"])
+        # Start the solving of PROBLEM 2
+        run_all_process(problem_name, model_filepath, data_filepath, output_filepath, offline, opl_exe_path, parser)
+
+    tf = time.time()
     info("Program ends in \t{0:.{digits}f} seconds.".format((tf-t0), digits=3))

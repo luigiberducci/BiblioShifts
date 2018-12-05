@@ -231,13 +231,16 @@ class Solver:
         p = subprocess.Popen([self.opl_exe, self.model_file, self.data_file], stdout=PIPE)
         out = p.communicate()
 
+        opt_val = None                      # Optimal value initialization
         out_lines = str(out).split("\\n")
-        begin = 0
-        end   = len(out_lines)
+        begin = 0                           # Begin line CSV output
+        end   = len(out_lines)              # End line CSV output
 
         for l, line in enumerate(out_lines):
-            if "no solution" in line:   # Catch unsolvability
-                return ""
+            if "OBJECTIVE" in line:     # Retrieve optimal result of objective function
+                opt_val = line.split(": ")[1]
+            if "no solution" in line:   # Retrieve unsolvability and eventually break execution
+                return None,""
             if "[Info]" in line:    # Retrieve the delimiters lines, discarding the cplex output
                 if "Begin output" in line:  # Starting line
                     begin = l
@@ -264,7 +267,7 @@ class Solver:
 
             result[day][shift] = student
 
-        return result
+        return opt_val, result
 
 
     def get_result():

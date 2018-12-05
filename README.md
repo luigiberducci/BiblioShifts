@@ -11,7 +11,7 @@ Enjoy!
 ## Updates
 **UPDATE 04.12.2018**: Changed the model introducing and objective function which improves assignment balancing. It is defined as minimization of mean variance, formally: 
 
-_`1/n*sum\_{s in students} (number\_of\_shifts\_assigned\_to[s] - avg\_shifts\_assigned)^2`_
+*`1/n\*sum_{s in students} (number_of_shifts_assigned_to[s] - avg_shifts_assigned)^2`*
 
 where 
 

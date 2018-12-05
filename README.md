@@ -9,16 +9,26 @@ This version performs automatic rostering by first parsing data from a Doodle po
 Enjoy!
 
 ## Updates
-UPDATE 04.12.2018: Changed the model introducing and objective function which improves load balancing. It is defined as minimization of mean variance, formally: 
+**UPDATE 04.12.2018**: Changed the model introducing and objective function which improves assignment balancing. It is defined as minimization of mean variance, formally: 
 
-`1/n*sum_{s in students} (number_of_shifts_assigned_to[s] - avg_shifts_assigned)^2`
+_`1/n*sum\_{s in students} (number\_of\_shifts\_assigned\_to[s] - avg\_shifts\_assigned)^2`_
 
 where 
 
-    -`number_of_shifts_assigned_to[s]` is the number of shifts assigned to the student `s`
-    -`avg_shifts_assigned` is computed as `total_number_of_shifts`/`number_of_students`
+*   _`number\_of\_shifts\_assigned\_to[s]` is the number of shifts assigned to the student `s`_
+*   _`avg\_shifts\_assigned` is computed as `total\_number\_of\_shifts`/`number\_of\_students`_
 
 Notice that this update make the current model NOT LINEAR but since CPLEX supports quadratic objective function, this is still efficiently solved.
+
+**UPDATE 05.12.2018**: New model for minimize the number of overall trips required to cover all the shifts. Often, some students prefer to do more than one shift per day. If this is allowed by the library manager, then this model minimize the number of trips that the students have to do to reach the university. The main difference with the previous model is the objective function which minimize the number of day that each student spends in the library, formally:
+
+_`sum\_{s in students, d in days} Trips[s][d]`_
+
+where
+
+*    _`Trips[s][d]` is 1 if the student `s` has at least one shift in the day `d`, 0 otherwise_
+
+Notice that this model is LINEAR but doesn't implement a balanced assignment because CPLEX allows only one objective function. Then you have to play with min-max number of shifts per student to manually implement balancing.
 
 ## Requirements
 

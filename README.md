@@ -6,7 +6,7 @@ It represents an extension of the `turni-biblioteca` software by Cristian Di Pie
 
 This version performs automatic rostering by first parsing data from a Doodle poll, then solve a Integer Linear Programming Problem to assign a poll participant to each option of the poll, according to expressed availabilities. Finally, it produces a `xlsx` output file which contains an Excel representation of the computed assignment.
 
-Enjoy!
+*Enjoy!*
 
 ## Updates
 **UPDATE 04.12.2018**: Changed the model introducing and objective function which improves assignment balancing. It is defined as minimization of mean variance, formally: 
